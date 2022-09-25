@@ -9,6 +9,9 @@ WCD <- WorldCupData %>%
   mutate(HomeScoreDifferential = HomeGoals - AwayGoals) %>%
   mutate(AwayScoreDifferential = AwayGoals - HomeGoals)
 
+WCD$Home = sub("\\s+[^ ]+$", "", WCD$Home)
+WCD$Away = sub(".*?? ", "", WCD$Away)
+
 WCD %>%
   group_by(Away) %>%
   summarise(mean = mean(HomeScoreDifferential),
@@ -35,9 +38,6 @@ WCD2018Away <- WorldCupData %>%
   group_by(Away) %>%
   summarize(Goals = sum(AwayGoals))
 
-#Need to string manipulate to make the countries in the same order
-
 WCD2018Home$Goals + WCD2018Away$Goals
 
 #Make an argument for which team is the most exciting to watch in the past 10 years
-
