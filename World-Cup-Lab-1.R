@@ -49,34 +49,49 @@ WCD2018 <- WCD2018Home %>%
 
 #Make an argument for which team is the most exciting to watch in the past 10 years
 
-#High Scoring
 WCDExcite <- WCD %>%
   filter(year(Date) > 2012) %>%
-  mutate(TotalGoals = HomeGoals + AwayGoals) 
+  mutate(TotalGoals = HomeGoals + AwayGoals,
+         CloseGames = ifelse(abs(HomeGoals - AwayGoals) <= 1, 1, 0))
 
-WCDExcite %>%
+WCDExciteHome <- WCDExcite %>%
   group_by(Home) %>%
-  summarize(meanGoals = mean(TotalGoals),
+  summarize(totalGoals = sum(TotalGoals),
+            scoreDiff = sum(HomeScoreDifferential),
+            numCloseGames = sum(CloseGames),
             games = n()) %>%
-  arrange(-meanGoals)
+  arrange(Home)
 
-WCDExcite %>%
+WCDExciteAway <- WCDExcite%>%
   group_by(Away) %>%
-  summarize(meanGoals = mean(TotalGoals),
+  summarize(totalGoals = sum(TotalGoals),
+            scoreDiff = sum(HomeScoreDifferential),
+            numCloseGames = sum(CloseGames),
             games = n()) %>%
-  arrange(-meanGoals)
+  arrange(Away)
 
-#Close Games
+colnames(WCDExciteHome) <- c("Team", "totalGoals", "scoreDiff", "numCloseGames", "games")
+colnames(WCDExciteAway) <- c("Team", "totalGoals", "scoreDiff", "numCloseGames", "games")
 
-WCDExcite %>%
-  group_by(Away) %>%
-  summarise(mean = mean(AwayScoreDifferential),
-            count = n()) %>%
-  arrange(-mean)
+WCDExciteTotal <- data.frame(Team = WCDExciteHome$Team,
+                             totalGoals = WCDExciteHome$totalGoals + WCDExciteAway$totalGoals,
+                             scoreDiff = WCDExciteHome$scoreDiff + WCDExciteAway$scoreDiff,
+                             closeGames = WCDExciteHome$numCloseGames + WCDExciteAway$numCloseGames,
+                             games = WCDExciteHome$games + WCDExciteAway$games) %>%  
+  mutate(goalsPerGame = totalGoals/games,
+         avgScoreDiff = scoreDiff/games,
+         closeGamePercent = closeGames/games)
 
-WCDExcite %>%
-  group_by(Home) %>%
-  summarise(mean = mean(HomeScoreDifferential),
-            count = n()) %>%
-  arrange(-mean)
+#The three attributes of a soccer game I find the most entertaining are success, close games, and 
+#high-scoring. I mutated the dataframes to create variables evaluating these metrics. 
+#To address high scoring, I averaged the total number of goals scored in each games that a team played.
+#To address success, I averaged the score difference for each game played
+#To address close games, I calculated the percentage of games within one goal
+
+#There are several teams that fit these characteristics, however, in the past 10 years 100% of Scotland's
+#games have finished within one goal. Scotland also has a very high average of 4 goals scored a game
+#in total and a slightly positive average score difference of 0.67 goals, meaning that on average
+#Scotland wins games by 0.67 goals. This score differential is perfect because it is slightly positive,
+#where they will win most of the time but still keep games close.
+  
   
