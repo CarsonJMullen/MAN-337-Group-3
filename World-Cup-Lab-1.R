@@ -49,6 +49,18 @@ WCD2018 <- WCD2018Home %>%
 
 #Make an argument for which team is the most exciting to watch in the past 10 years
 
+#The three attributes of a soccer game I find the most entertaining are success, close games, and 
+#high-scoring. I mutated the dataframes to create variables evaluating these metrics. 
+#To address high scoring, I averaged the total number of goals scored in each games that a team played.
+#To address success, I averaged the score difference for each game played
+#To address close games, I calculated the percentage of games within one goal
+
+#There are several teams that fit these characteristics, however, in the past 10 years 100% of Scotland's
+#games have finished within one goal. Scotland also has a very high average of 4 goals scored a game
+#in total and a slightly positive average score difference of 0.67 goals, meaning that on average
+#Scotland wins games by 0.67 goals. This score differential is perfect because it is slightly positive,
+#where they will win most of the time but still keep games close.
+
 WCDExcite <- WCD %>%
   filter(year(Date) > 2012) %>%
   mutate(TotalGoals = HomeGoals + AwayGoals,
@@ -81,17 +93,3 @@ WCDExciteTotal <- data.frame(Team = WCDExciteHome$Team,
   mutate(goalsPerGame = totalGoals/games,
          avgScoreDiff = scoreDiff/games,
          closeGamePercent = closeGames/games)
-
-#The three attributes of a soccer game I find the most entertaining are success, close games, and 
-#high-scoring. I mutated the dataframes to create variables evaluating these metrics. 
-#To address high scoring, I averaged the total number of goals scored in each games that a team played.
-#To address success, I averaged the score difference for each game played
-#To address close games, I calculated the percentage of games within one goal
-
-#There are several teams that fit these characteristics, however, in the past 10 years 100% of Scotland's
-#games have finished within one goal. Scotland also has a very high average of 4 goals scored a game
-#in total and a slightly positive average score difference of 0.67 goals, meaning that on average
-#Scotland wins games by 0.67 goals. This score differential is perfect because it is slightly positive,
-#where they will win most of the time but still keep games close.
-  
-  
