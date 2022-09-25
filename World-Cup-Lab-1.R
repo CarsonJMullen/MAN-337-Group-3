@@ -35,6 +35,8 @@ WCD2018Away <- WorldCupData %>%
   group_by(Away) %>%
   summarize(Goals = sum(AwayGoals))
 
+#Need to string manipulate to make the countries in the same order
+
 WCD2018Home$Goals + WCD2018Away$Goals
 
 #Make an argument for which team is the most exciting to watch in the past 10 years
