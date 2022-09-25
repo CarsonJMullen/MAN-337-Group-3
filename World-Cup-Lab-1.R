@@ -43,15 +43,40 @@ WCD2018Away <- WCD %>%
   group_by(Away) %>%
   summarize(Goals = sum(AwayGoals))
 
-WCD2018Home$Goals + WCD2018Away$Goals
+WCD2018Home$AwayGoals <- WCD2018Away$Goals
+WCD2018 <- WCD2018Home %>%
+  mutate(TotalGoals = Goals + AwayGoals)
 
 #Make an argument for which team is the most exciting to watch in the past 10 years
 
 #High Scoring
-WCDExciteHome <- WCD %>%
+WCDExcite <- WCD %>%
   filter(year(Date) > 2012) %>%
-  mutate(TotalGoals = HomeGoals + AwayGoals)
+  mutate(TotalGoals = HomeGoals + AwayGoals) 
 
+WCDExcite %>%
+  group_by(Home) %>%
+  summarize(meanGoals = mean(TotalGoals),
+            games = n()) %>%
+  arrange(-meanGoals)
 
+WCDExcite %>%
+  group_by(Away) %>%
+  summarize(meanGoals = mean(TotalGoals),
+            games = n()) %>%
+  arrange(-meanGoals)
 
 #Close Games
+
+WCDExcite %>%
+  group_by(Away) %>%
+  summarise(mean = mean(AwayScoreDifferential),
+            count = n()) %>%
+  arrange(-mean)
+
+WCDExcite %>%
+  group_by(Home) %>%
+  summarise(mean = mean(HomeScoreDifferential),
+            count = n()) %>%
+  arrange(-mean)
+  
