@@ -3,39 +3,46 @@ library(lubridate)
 
 #Cleaning Data
 
+#Filtering out NA data and adding a score differential variable
 WCD <- WorldCupData %>%
   filter(!is.na(HomeGoals)) %>%
   filter(Date < '2022-09-19') %>%
   mutate(HomeScoreDifferential = HomeGoals - AwayGoals) %>%
   mutate(AwayScoreDifferential = AwayGoals - HomeGoals)
 
+#Standardizing naming conventions to just have the country.
 WCD$Home = sub("\\s+[^ ]+$", "", WCD$Home)
 WCD$Away = sub(".*?? ", "", WCD$Away)
 
 #Better Home than Away?
-#The Czech Republic has the best home field advantage in observed events
-#because on average the Czech Republic will beat their opponent by 5 more goals 
-#at home rather than away. 
+
+#Cuba has the best home field advantage in observed events
+#because on average the Czech Republic will beat their opponent by 8.5 more goals 
+#at home rather than away. This is also an extremely small sample size. Hungary has 
+#the best home field advantage with over 10 games both home and away. 
 
 #Some additional factors would be the location of the of the event because
 #most of the stadiums were in neutral sites. Additionally, number of fans 
 #present and supporting each team could help describe perceived home-field advantages.
 
-WCDBetterHome <- WCD %>%
+#Have to create individual data frames because you group by home/away to evaluate the score of a single team
+WCDBetterAway <- WCD %>%
   group_by(Away) %>%
   summarise(mean = mean(AwayScoreDifferential),
             count = n()) %>%
   arrange(-mean)
 
-WCDBetterAway <- WCD %>%
+WCDBetterHome <- WCD %>%
   group_by(Home) %>%
   summarise(mean = mean(HomeScoreDifferential),
             count = n()) %>%
   arrange(-mean)
 
+#Renaming columns to match so that when we merge them it knows to match by team
 colnames(WCDBetterHome) <- c("Team", "AvgScoreDiff", "Games")
 colnames(WCDBetterAway) <- c("Team", "AvgScoreDiff", "Games")
 
+#Merging dfs. x is home and y is away
 WCDBetterTotal <- merge(WCDBetterHome, WCDBetterAway, by = "Team", all = TRUE) %>%
   mutate(HomeAwayDiff = AvgScoreDiff.x - AvgScoreDiff.y)
 
@@ -48,7 +55,7 @@ WCD2018Home <- WCD %>%
   filter(year(Date) == '2018') %>%
   group_by(Home) %>%
   summarize(Goals = sum(HomeGoals))
-  
+
 WCD2018Away <- WCD %>%
   filter(year(Date) == '2018') %>%
   group_by(Away) %>%
@@ -62,8 +69,8 @@ WCD2018 <- WCD2018Home %>%
 
 WCDExcite <- WCD %>%
   filter(year(Date) > 2012) %>%
-  mutate(TotalGoals = HomeGoals + AwayGoals,
-         CloseGames = ifelse(abs(HomeGoals - AwayGoals) <= 1, 1, 0))
+  mutate(TotalGoals = HomeGoals + AwayGoals, #total goals scored in a game
+         CloseGames = ifelse(abs(HomeGoals - AwayGoals) <= 1, 1, 0)) #dummy variable which is 1 if one goal game, 0 if more than that
 
 WCDExciteHome <- WCDExcite %>%
   group_by(Home) %>%
@@ -104,4 +111,3 @@ WCDExciteTotal <- data.frame(Team = WCDExciteHome$Team,
 #in total and a slightly positive average score difference of 0.67 goals, meaning that on average
 #Scotland wins games by 0.67 goals. This score differential is perfect because it is slightly positive,
 #where they will win most of the time but still keep games close.
-  
