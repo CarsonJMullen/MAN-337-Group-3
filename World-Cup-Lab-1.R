@@ -17,7 +17,7 @@ WCD$Away = sub(".*?? ", "", WCD$Away)
 #Better Home than Away?
 
 #Cuba has the best home field advantage in observed events
-#because on average the Czech Republic will beat their opponent by 8.5 more goals 
+#because on average the Cuba will beat their opponent by 8.5 more goals 
 #at home rather than away. This is also an extremely small sample size. Hungary has 
 #the best home field advantage with over 10 games both home and away. 
 
