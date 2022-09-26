@@ -13,20 +13,31 @@ WCD$Home = sub("\\s+[^ ]+$", "", WCD$Home)
 WCD$Away = sub(".*?? ", "", WCD$Away)
 
 #Better Home than Away?
+#The Czech Republic has the best home field advantage in observed events
+#because on average the Czech Republic will beat their opponent by 5 more goals 
+#at home rather than away. 
 
-WCD %>%
+#Some additional factors would be the location of the of the event because
+#most of the stadiums were in neutral sites. Additionally, number of fans 
+#present and supporting each team could help describe perceived home-field advantages.
+
+WCDBetterHome <- WCD %>%
   group_by(Away) %>%
   summarise(mean = mean(AwayScoreDifferential),
             count = n()) %>%
-  filter(count > 10) %>%
   arrange(-mean)
 
-WCD %>%
+WCDBetterAway <- WCD %>%
   group_by(Home) %>%
   summarise(mean = mean(HomeScoreDifferential),
             count = n()) %>%
-  filter(count > 10) %>%
   arrange(-mean)
+
+colnames(WCDBetterHome) <- c("Team", "AvgScoreDiff", "Games")
+colnames(WCDBetterAway) <- c("Team", "AvgScoreDiff", "Games")
+
+WCDBetterTotal <- merge(WCDBetterHome, WCDBetterAway, by = "Team", all = TRUE) %>%
+  mutate(HomeAwayDiff = AvgScoreDiff.x - AvgScoreDiff.y)
 
 #Which country scored the second most goals in 2018?
 
@@ -48,18 +59,6 @@ WCD2018 <- WCD2018Home %>%
   mutate(TotalGoals = Goals + AwayGoals)
 
 #Make an argument for which team is the most exciting to watch in the past 10 years
-
-#The three attributes of a soccer game I find the most entertaining are success, close games, and 
-#high-scoring. I mutated the dataframes to create variables evaluating these metrics. 
-#To address high scoring, I averaged the total number of goals scored in each games that a team played.
-#To address success, I averaged the score difference for each game played
-#To address close games, I calculated the percentage of games within one goal
-
-#There are several teams that fit these characteristics, however, in the past 10 years 100% of Scotland's
-#games have finished within one goal. Scotland also has a very high average of 4 goals scored a game
-#in total and a slightly positive average score difference of 0.67 goals, meaning that on average
-#Scotland wins games by 0.67 goals. This score differential is perfect because it is slightly positive,
-#where they will win most of the time but still keep games close.
 
 WCDExcite <- WCD %>%
   filter(year(Date) > 2012) %>%
@@ -93,3 +92,16 @@ WCDExciteTotal <- data.frame(Team = WCDExciteHome$Team,
   mutate(goalsPerGame = totalGoals/games,
          avgScoreDiff = scoreDiff/games,
          closeGamePercent = closeGames/games)
+
+#The three attributes of a soccer game I find the most entertaining are success, close games, and 
+#high-scoring. I mutated the dataframes to create variables evaluating these metrics. 
+#To address high scoring, I averaged the total number of goals scored in each games that a team played.
+#To address success, I averaged the score difference for each game played
+#To address close games, I calculated the percentage of games within one goal
+
+#There are several teams that fit these characteristics, however, in the past 10 years 100% of Scotland's
+#games have finished within one goal. Scotland also has a very high average of 4 goals scored a game
+#in total and a slightly positive average score difference of 0.67 goals, meaning that on average
+#Scotland wins games by 0.67 goals. This score differential is perfect because it is slightly positive,
+#where they will win most of the time but still keep games close.
+  
