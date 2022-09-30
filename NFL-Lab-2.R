@@ -56,6 +56,9 @@ NFLTotalQBOTs <- merge(NFLHomeQBOTs, NFLAwayQBOTs)
 NFLTotalQBOTs <- NFLTotalQBOTs %>%
   mutate(TotalOTs = HomeOTs + AwayOTs)
 
+# Kirk Cousins has played the most overtime games at 9. Derek Carr, Drew Brees,
+# and Russell Wilson are tied for second with 8.
+
 # Since the timeline is pretty large, you'd want to know how many games the QB
 # started, if they retired during the time frame or if they were drafted/became
 # the starter during the time frame. The how many games started number is
