@@ -57,7 +57,7 @@ NFLTotalQBOTs <- NFLTotalQBOTs %>%
   mutate(TotalOTs = HomeOTs + AwayOTs)
 
 # Since the timeline is pretty large, you'd want to know how many games the QB
-# started, if they retired during the timeframe or if they were drafted/became
-# the started during the time frame. The how many games started number is
-# important because playoffs are included so even if it was over one season,
-# not all QBs will play in the same number of games.
+# started, if they retired during the time frame or if they were drafted/became
+# the starter during the time frame. The how many games started number is
+# also important because playoffs are included so even if it was over one 
+# season, not all QBs will play in the same number of games.
