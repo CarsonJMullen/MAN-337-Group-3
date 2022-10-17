@@ -30,3 +30,19 @@ ggplot(NFL_By_Year) +
   geom_line(aes(x=season, y=correct_percent)) +
   ylim(0, 1)
 
+
+# This shows the percentage of games in a season that were correct against the spread.
+# The percentage floats around 50% which makes sense because the spread is set to 
+# make gambling competitive and there should be bets on both sides of the spread.
+# That being said, it does not appear that the line has gotten tighter around 50%.
+
+NFLGameData <- NFLGameData %>% mutate(spread_correct = spread_line > result)
+
+NFLGameDataYearly <- NFLGameData %>% 
+  group_by(season) %>%
+  summarize(percent_correct = mean(spread_correct))
+
+ggplot(NFLGameDataYearly) +
+  geom_line(aes(x=season, y=percent_correct)) +
+  ylim(0, 1)
+
