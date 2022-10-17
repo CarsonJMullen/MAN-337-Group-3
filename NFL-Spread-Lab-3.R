@@ -18,8 +18,8 @@ NFLGameData = NFLGameData %>%
 #Group by year
 NFL_By_Year <- NFLGameData %>%
   group_by(season) %>%
-  summarize(median_diff = mean(abs(spread_vs_real)),
-            correct_percent = mean(favored_correct))
+  summarize(median_diff = median(abs(spread_vs_real)),
+            correct_percent = median(favored_correct))
 
 # Used median rather than mean because the absolute value of the difference in
 # actual vs spread is heavily skewed to the right.
