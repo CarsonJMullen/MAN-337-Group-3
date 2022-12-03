@@ -35,8 +35,19 @@ cum_carries <- ave(NFL_rushing_season_stats$carries, NFL_rushing_season_stats$pl
 NFL_rushing_season_stats$cum_rushing_yards <- cum_yards_season
 NFL_rushing_season_stats$cum_carries <- cum_carries
 
+NFL_rushing_season_stats$ypc <- NFL_rushing_season_stats$rushing_yards/NFL_rushing_season_stats$carries
+
+NFL_rbs <- merge(NFL_rbs, 
+                 NFL_rushing_stats %>% group_by(player_id) %>%
+                   summarise(seasons = max(years), carries = sum(carries), rushing_yards = sum(rushing_yards)))
+
+top_2000 <- NFL_rbs %>%
+  filter(carries >= 2000)
+
+top_2000$player_id
+
 average_player <- NFL_rushing_season_stats %>%
-  
+  filter(player_id %in% top_2000$player_id) %>%
   group_by(season_num) %>%
   summarize(cum_carries = median(cum_carries),
             rushing_yards = median(rushing_yards))
@@ -45,8 +56,6 @@ carries_vs_season <- ggplot(average_player, aes(x=season_num, y=cum_carries)) +
   geom_line()
 rush_yds_vs_season <- ggplot(average_player, aes(x=season_num, y=rushing_yards)) +
   geom_line()
-
-
 
 carriesColor <- "#69b3a2"
 rushingYdsColor <- rgb(0.2, 0.6, 0.9, 1)
@@ -64,9 +73,3 @@ ggplot(average_player, aes(x = season_num)) +
     axis.title.y = element_text(color = carriesColor),
     axis.title.y.right = element_text(color = rushingYdsColor)
   )
-
-NFL_rushing_season_stats$ypc <- NFL_rushing_season_stats$rushing_yards/NFL_rushing_season_stats$carries
-
-NFL_rbs <- merge(NFL_rbs, 
-                 NFL_rushing_stats %>% group_by(player_id) %>%
-                   summarise(seasons = max(years), carries = sum(carries), rushing_yards = sum(rushing_yards)))
